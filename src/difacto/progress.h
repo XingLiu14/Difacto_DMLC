@@ -1,14 +1,15 @@
 #pragma once
+#include <cmath>
 #include <vector>
 #include <string>
 namespace dmlc {
 namespace difacto {
 
 struct Progress {
-  Progress() : data(8) { }
+  Progress() : data(9) { }
 
   static std::string HeadStr() {
-    return "  ttl #ex   inc #ex |  |w|_0  logloss_w |   |V|_0    logloss    AUC";
+    return "  ttl #ex   inc #ex |  |w|_0  logloss_w |   |V|_0    logloss    AUC    RMSE";
   }
 
   std::string PrintStr() {
@@ -21,9 +22,9 @@ struct Progress {
     if (new_ex() == 0) return "";
 
     char buf[256];
-    snprintf(buf, 256, "%9.4g  %7.2g | %9.4g  %6.4lf | %9.4g  %7.5lf  %7.5lf ",
+    snprintf(buf, 256, "%9.4g  %7.2g | %9.4g  %6.4lf | %9.4g  %7.5lf  %7.5lf  %7.5lf ",
              ttl_ex, new_ex(), nnz_w, objv_w() / new_ex(), nnz_V,
-             objv() / new_ex(),  auc() / count());
+             objv() / new_ex(),  auc() / count(),  sqrt(se() / new_ex()));
     return std::string(buf);
   }
 
@@ -36,6 +37,7 @@ struct Progress {
   double& new_ex() { return data[5]; }
   double& new_w() { return data[6]; }
   double& new_V() { return data[7]; }
+  double& se() { return data[8]; }
 
   double objv() const { return data[0]; }
   double new_ex() const { return data[5]; }
